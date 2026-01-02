@@ -1,0 +1,62 @@
+[
+  {
+    "item_id": "CAR-001",
+    "type": "vehicle",
+    "name": "Tesla Model 3",
+    "category": "Electric Car"
+  },
+  {
+    "item_id": "CAR-002",
+    "type": "vehicle",
+    "name": "Toyota Camry",
+    "category": "Sedan"
+  },
+  {
+    "item_id": "CAR-003",
+    "type": "vehicle",
+    "name": "Ford F-150",
+    "category": "Truck"
+  },
+  {
+    "item_id": "CAR-004",
+    "type": "vehicle",
+    "name": "Honda Civic",
+    "category": "Sedan"
+  },
+  {
+    "item_id": "CAR-005",
+    "type": "vehicle",
+    "name": "BMW X5",
+    "category": "SUV"
+  },
+  {
+    "item_id": "HOUSE-001",
+    "type": "real_state",
+    "name": "Downtown Apartment",
+    "category": "Apartment"
+  },
+  {
+    "item_id": "HOUSE-002",
+    "type": "real_state",
+    "name": "Suburban House",
+    "category": "Single Family"
+  },
+  {
+    "item_id": "HOUSE-003",
+    "type": "real_state",
+    "name": "Beach Condo",
+    "category": "Condo"
+  },
+  {
+    "item_id": "HOUSE-004",
+    "type": "real_state",
+    "name": "Mountain Cabin",
+    "category": "Cabin"
+  },
+  {
+    "item_id": "HOUSE-005",
+    "type": "real_state",
+    "name": "City Loft",
+    "category": "Loft"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {"customer_id": "CUST-001", "credit_score": 750},
+  {"customer_id": "CUST-002", "credit_score": 680},
+  {"customer_id": "CUST-003", "credit_score": 720},
+  {"customer_id": "CUST-004", "credit_score": 650},
+  {"customer_id": "CUST-005", "credit_score": 800},
+  {"customer_id": "CUST-006", "credit_score": 590},
+  {"customer_id": "CUST-007", "credit_score": 710},
+  {"customer_id": "CUST-008", "credit_score": 670},
+  {"customer_id": "CUST-009", "credit_score": 780},
+  {"customer_id": "CUST-010", "credit_score": 620}
+]

@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  namespace: bizevents-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      labels:
+        app: load-generator
+    spec:
+      containers:
+      - name: load-generator
+        image: load-generator:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LOAN_CHECKER_URL
+          value: "http://loan-checker:3000/check"
+        - name: TRANSACTIONS_PER_SECOND
+          value: "2"
+        - name: INVALID_REQUESTS_PCT
+          value: "10"
+        - name: INVALID_ITEMS_PCT
+          value: "15"
+        - name: PARTNER_NAMES
+          value: "BankCorp,LoanMasters,QuickCredit,PrimeLending"
+        # Optional: Dynatrace Business Events ingestion
+        # - name: DT_INGEST_URL
+        #   value: "https://your-tenant.live.dynatrace.com"
+        # - name: DT_API_TOKEN
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: dynatrace-token
+        #       key: api-token
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

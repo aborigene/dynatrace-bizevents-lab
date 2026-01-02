@@ -1,0 +1,126 @@
+---
+# Personal Processor
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: personal-processor
+  namespace: bizevents-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: personal-processor
+  template:
+    metadata:
+      labels:
+        app: personal-processor
+        processor-type: personal
+    spec:
+      containers:
+      - name: personal-processor
+        image: loan-processor:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        - name: KAFKA_TOPIC
+          value: "loans-personal"
+        - name: PROCESSOR_TYPE
+          value: "personal"
+        - name: LOAN_APPROVER_URL
+          value: "http://loan-approver:8090"
+        - name: SERVER_PORT
+          value: "8080"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+# Real State Processor
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: real-state-processor
+  namespace: bizevents-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: real-state-processor
+  template:
+    metadata:
+      labels:
+        app: real-state-processor
+        processor-type: real-state
+    spec:
+      containers:
+      - name: real-state-processor
+        image: loan-processor:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8081
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        - name: KAFKA_TOPIC
+          value: "loans-real-state"
+        - name: PROCESSOR_TYPE
+          value: "real_state"
+        - name: LOAN_APPROVER_URL
+          value: "http://loan-approver:8090"
+        - name: SERVER_PORT
+          value: "8081"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+# Vehicle Processor
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicle-processor
+  namespace: bizevents-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vehicle-processor
+  template:
+    metadata:
+      labels:
+        app: vehicle-processor
+        processor-type: vehicle
+    spec:
+      containers:
+      - name: vehicle-processor
+        image: loan-processor:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8082
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        - name: KAFKA_TOPIC
+          value: "loans-vehicle"
+        - name: PROCESSOR_TYPE
+          value: "vehicle"
+        - name: LOAN_APPROVER_URL
+          value: "http://loan-approver:8090"
+        - name: SERVER_PORT
+          value: "8082"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"

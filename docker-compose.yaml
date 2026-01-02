@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - bizevents-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - bizevents-net
+
+  loan-checker:
+    build: ./loan-checker
+    ports:
+      - "3000:3000"
+    environment:
+      - LOAN_ROUTER_URL=http://loan-router:5000/route
+    depends_on:
+      - loan-router
+    networks:
+      - bizevents-net
+
+  loan-router:
+    build: ./loan-router
+    ports:
+      - "5000:5000"
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - bizevents-net
+
+  personal-processor:
+    build: ./processors
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=loans-personal
+      - PROCESSOR_TYPE=personal
+      - LOAN_APPROVER_URL=http://loan-approver:8090
+      - SERVER_PORT=8080
+    depends_on:
+      - kafka
+      - loan-approver
+    networks:
+      - bizevents-net
+
+  real-state-processor:
+    build: ./processors
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=loans-real-state
+      - PROCESSOR_TYPE=real_state
+      - LOAN_APPROVER_URL=http://loan-approver:8090
+      - SERVER_PORT=8081
+    depends_on:
+      - kafka
+      - loan-approver
+    networks:
+      - bizevents-net
+
+  vehicle-processor:
+    build: ./processors
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=loans-vehicle
+      - PROCESSOR_TYPE=vehicle
+      - LOAN_APPROVER_URL=http://loan-approver:8090
+      - SERVER_PORT=8082
+    depends_on:
+      - kafka
+      - loan-approver
+    networks:
+      - bizevents-net
+
+  loan-approver:
+    build: ./loan-approver
+    ports:
+      - "8090:8090"
+    environment:
+      - LOAN_NOTIFIER_URL=http://loan-notifier:5001
+    depends_on:
+      - loan-notifier
+    networks:
+      - bizevents-net
+
+  loan-notifier:
+    build: ./loan-notifier
+    ports:
+      - "5001:5001"
+    networks:
+      - bizevents-net
+
+  load-generator:
+    build: ./load-generator
+    environment:
+      - LOAN_CHECKER_URL=http://loan-checker:3000/check
+      - TRANSACTIONS_PER_SECOND=2
+      - INVALID_REQUESTS_PCT=10
+      - INVALID_ITEMS_PCT=15
+      - PARTNER_NAMES=BankCorp,LoanMasters,QuickCredit,PrimeLending
+    depends_on:
+      - loan-checker
+    networks:
+      - bizevents-net
+
+networks:
+  bizevents-net:
+    driver: bridge
