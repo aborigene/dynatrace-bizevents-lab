@@ -7,6 +7,7 @@ import random
 import requests
 from datetime import datetime
 import logging
+import oneagent
 
 # Configure logging
 logging.basicConfig(
@@ -14,6 +15,9 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Initialize Dynatrace SDK
+sdk = oneagent.get_sdk()
 
 # Configuration from environment variables
 LOAN_CHECKER_URL = os.getenv('LOAN_CHECKER_URL', 'http://loan-checker:3000/check')
@@ -166,25 +170,33 @@ def main():
             # Generate and send request
             request_data = generate_loan_request()
             
-            # Send bizevent to Dynatrace
-            bizevent = {
-                'event.type': 'newLoanRequest',
-                'event.provider': 'load-generator',
-                'request_id': request_data['request_id'],
-                'loan_type': request_data.get('loan_type', 'unknown'),
-                'loan_requested_value': request_data.get('loan_requested_value', 0),
-                'customer_id': request_data.get('customer_id', 'unknown'),
-                'partner_name': request_data.get('partner_name', 'unknown'),
-                'timestamp': request_data['timestamp']
-            }
-            
-            if 'loan_item' in request_data:
-                bizevent['loan_item'] = request_data['loan_item']
-            
-            send_bizevent(bizevent)
-            
-            # Send to loan checker
-            send_request_to_checker(request_data)
+            # Create custom service for this transaction
+            with sdk.trace_custom_service('process_loan_request', 'LoadGenerator'):
+                # Add custom tags for better visibility
+                sdk.add_custom_request_attribute('request_id', request_data['request_id'])
+                sdk.add_custom_request_attribute('loan_type', request_data.get('loan_type', 'unknown'))
+                sdk.add_custom_request_attribute('customer_id', request_data.get('customer_id', 'unknown'))
+                sdk.add_custom_request_attribute('partner_name', request_data.get('partner_name', 'unknown'))
+                
+                # Send bizevent to Dynatrace
+                bizevent = {
+                    'event.type': 'newLoanRequest',
+                    'event.provider': 'load-generator',
+                    'request_id': request_data['request_id'],
+                    'loan_type': request_data.get('loan_type', 'unknown'),
+                    'loan_requested_value': request_data.get('loan_requested_value', 0),
+                    'customer_id': request_data.get('customer_id', 'unknown'),
+                    'partner_name': request_data.get('partner_name', 'unknown'),
+                    'timestamp': request_data['timestamp']
+                }
+                
+                if 'loan_item' in request_data:
+                    bizevent['loan_item'] = request_data['loan_item']
+                
+                send_bizevent(bizevent)
+                
+                # Send to loan checker
+                send_request_to_checker(request_data)
             
             request_count += 1
             

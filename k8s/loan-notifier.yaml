@@ -30,8 +30,11 @@ spec:
     spec:
       containers:
       - name: loan-notifier
-        image: loan-notifier:latest
+        image: igoroschsimoes/loan-notifier:v1.0.1
         imagePullPolicy: IfNotPresent
+        env:
+        - name: DT_PYTHON_INSTRUMENTATION
+          value: "true"
         ports:
         - containerPort: 5001
         resources:
