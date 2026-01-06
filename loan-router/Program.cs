@@ -170,16 +170,16 @@ public class RouteController : ControllerBase
         // Add risk level to request
         var enrichedRequest = new
         {
-            request.RequestId,
-            request.LoanType,
-            request.LoanRequestedValue,
-            request.LoanItem,
-            request.LoanItemName,
-            request.CustomerId,
-            request.PartnerName,
-            request.Timestamp,
-            RiskLevel = riskLevel,
-            ItemExists = itemExists
+            request_id = request.RequestId,
+            loan_type = request.LoanType,
+            loan_requested_value = request.LoanRequestedValue,
+            loan_item = request.LoanItem,
+            loan_item_name = request.LoanItemName,
+            customer_id = request.CustomerId,
+            partner_name = request.PartnerName,
+            timestamp = request.Timestamp,
+            risk_level = riskLevel,
+            item_exists = itemExists
         };
         
         // Determine Kafka topic based on loan type

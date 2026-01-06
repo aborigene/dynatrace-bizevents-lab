@@ -30,8 +30,8 @@ spec:
     spec:
       containers:
       - name: loan-router
-        image: loan-router:latest
-        imagePullPolicy: IfNotPresent
+        image: igoroschsimoes/loan-router:v1.0.0
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         env:
@@ -48,11 +48,15 @@ spec:
           httpGet:
             path: /health
             port: 5000
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
         readinessProbe:
           httpGet:
             path: /health
             port: 5000
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
           periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
